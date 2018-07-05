@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * This method is using an AsyncTask to handle the mail sending process in the background
+     * This method uses classes imported from .jar libraries added into the libs folder
      */
     @OnClick(R.id.btnEmail)
     void sendEmail() {
