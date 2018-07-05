@@ -8,7 +8,7 @@ public class LongOperation extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         try {
-            GMailSender sender = new GMailSender("monwar.mcc@gmail.com", "f0reveral0ne");
+            GMailSender sender = new GMailSender("monwar.mcc@gmail.com", "yourPassWord");
             sender.sendMail("This is a testing mail",
                     "This is Body of testing mail", "monwar.mcc@gmail.com",
                     "kibria.mcc@gmail.com, rezaulislam.mcc@gmail.com");

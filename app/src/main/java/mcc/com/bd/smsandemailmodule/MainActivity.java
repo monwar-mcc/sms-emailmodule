@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * This method is using an AsyncTask to handle the mail sending process in the background
+     */
     @OnClick(R.id.btnEmail)
     void sendEmail() {
         try {
@@ -75,8 +78,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to send sms to a single number
+     * @param phoneNumber
+     * * @param smsText
+     */
     private void invokeSmsManager(String phoneNumber, String smsText) {
-
         if (phoneNumber.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
@@ -95,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     * @param message Alert message that will be shown to user before asking permission
+     */
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)
@@ -158,5 +169,18 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         unregisterReceiver(sentStatusReceiver);
         unregisterReceiver(deliveredStatusReceiver);
+    }
+
+
+    /**
+     *
+     * @param phone_numbers a list of numbers where sms will be sent
+     * @param messageToBeSent the text message which will be sent
+     */
+    public void sensMultipleSMS(List<String>phone_numbers, String messageToBeSent){
+
+        for (int i=0; i<phone_numbers.size(); i++){
+            invokeSmsManager(phone_numbers.get(i), messageToBeSent);
+        }
     }
 }
