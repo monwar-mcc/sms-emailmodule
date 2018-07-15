@@ -5,12 +5,17 @@ import android.util.Log;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +31,7 @@ public class GMailSender extends javax.mail.Authenticator {
     private String user;
     private String password;
     private Session session;
-
+    private Multipart _multipart;
     static {
         Security.addProvider(new JSSEProvider());
     }
@@ -35,6 +40,7 @@ public class GMailSender extends javax.mail.Authenticator {
         this.user = user;
         this.password = password;
         Properties props = new Properties();
+        _multipart = new MimeMultipart();
         props.setProperty("mail.transport.protocol", "smtp");
         props.setProperty("mail.host", mailhost);
         props.put("mail.smtp.auth", "true");
@@ -51,7 +57,18 @@ public class GMailSender extends javax.mail.Authenticator {
     protected PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(user, password);
     }
+    public void addAttachment(String filename,String subject) throws Exception {
+        BodyPart messageBodyPart = new MimeBodyPart();
+        DataSource source = new FileDataSource(filename);
+        messageBodyPart.setDataHandler(new DataHandler(source));
+        messageBodyPart.setFileName(filename);
+        _multipart.addBodyPart(messageBodyPart);
 
+        BodyPart messageBodyPart2 = new MimeBodyPart();
+        messageBodyPart2.setText(subject);
+
+        _multipart.addBodyPart(messageBodyPart2);
+    }
 
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception {
         try {
@@ -60,6 +77,7 @@ public class GMailSender extends javax.mail.Authenticator {
             message.setSender(new InternetAddress(sender));
             message.setSubject(subject);
             message.setDataHandler(handler);
+            message.setContent(_multipart);
             if (recipients.indexOf(',') > 0)
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipients));
             else

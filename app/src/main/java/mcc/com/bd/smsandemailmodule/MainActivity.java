@@ -23,6 +23,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import droidninja.filepicker.FilePickerBuilder;
+import droidninja.filepicker.FilePickerConst;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver sentStatusReceiver, deliveredStatusReceiver;
     private static final int REQUEST_SMS = 0;
 
+    private ArrayList<String> docPaths;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,15 +73,28 @@ public class MainActivity extends AppCompatActivity {
      */
     @OnClick(R.id.btnEmail)
     void sendEmail() {
-        try {
-            LongOperation l = new LongOperation();
-            l.execute();  //sends the email in background
-            Toast.makeText(this, l.get(), Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Log.e("SendMail", e.getMessage(), e);
+
+        FilePickerBuilder.getInstance().setMaxCount(1)
+                .setActivityTheme(R.style.LibAppTheme)
+                .pickFile(this);
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == FilePickerConst.REQUEST_CODE_DOC && resultCode == RESULT_OK && null != data)) {
+            docPaths = new ArrayList<>();
+            docPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS));
+            try {
+                LongOperation l = new LongOperation(docPaths.get(0));
+                l.execute();  //sends the email in background
+                Toast.makeText(this, l.get(), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e("SendMail", e.getMessage(), e);
+            }
+
         }
     }
-
     /**
      * Method to send sms to a single number
      * @param phoneNumber
